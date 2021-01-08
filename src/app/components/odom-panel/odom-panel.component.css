@@ -1,0 +1,10 @@
+.rtlBar {
+    direction: rtl;
+    
+}
+#steeringLabel {
+    width: 8rem;
+}
+#tbLabel {
+    width: 8rem;
+}
