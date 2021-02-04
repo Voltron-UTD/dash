@@ -1,5 +1,7 @@
 # Dash
 
+Web dashboard for data visualization and command shortcuts for Voltron. It can simply be run in a web browser, and connects via websockets to an instance of the ROS2 Web Bridge running in the Voltron container.
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.0.5.
 
 ## Development server
