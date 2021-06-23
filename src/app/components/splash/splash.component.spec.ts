@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OdomPanelComponent } from './odom-panel.component';
+import { SplashComponent } from './splash.component';
 
-describe('OdomPanelComponent', () => {
-  let component: OdomPanelComponent;
-  let fixture: ComponentFixture<OdomPanelComponent>;
+describe('SplashComponent', () => {
+  let component: SplashComponent;
+  let fixture: ComponentFixture<SplashComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OdomPanelComponent ]
+      declarations: [ SplashComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OdomPanelComponent);
+    fixture = TestBed.createComponent(SplashComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

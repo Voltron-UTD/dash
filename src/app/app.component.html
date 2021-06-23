@@ -1,13 +1,26 @@
+<header class="header-6">
+  <div class="branding">
+    <a href="javascript://" class="nav-link">
+      <!-- <cds-icon shape="vm-bug"></cds-icon> -->
+      <span class="title">Voltron</span>
+    </a>
+  </div>
+  <div class="header-nav">
+    <a href="javascript://" class="nav-link nav-text" routerLink="/splash">Home</a>
+    <a href="javascript://" class="nav-link nav-text" routerLink="/mapping-helper">Mapping Assistant</a>
+  </div>
+  <!-- <div class="header-actions">
+    <a href="javascript://" class="nav-link nav-icon" aria-label="settings">
+      <cds-icon shape="cog"></cds-icon>
+    </a>
+  </div> -->
+</header>
 
-<div>
-  <h1>Voltron Dash</h1>
-  <app-odom-panel></app-odom-panel>
-  <p>Actions</p>
-  <button class="btn btn-primary" (click)="sendMessage()">Send message</button>
-</div>
-
-<app-bridge-loading-screen *ngIf="!bridgeConnected">
-
-</app-bridge-loading-screen>
+<a routerLink="/splash" routerLinkActive="active">
+  Home
+</a>
+<a routerLink="/mapping-helper">
+  Mapping Helper
+</a>
 
 <router-outlet></router-outlet>

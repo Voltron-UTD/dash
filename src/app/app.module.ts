@@ -1,23 +1,27 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+// Clarity stuff
+import { ClarityModule } from '@clr/angular';
+import { ClarityIcons } from '@clr/icons';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
-import { ClarityModule } from "@clr/angular";
-import { BridgeLoadingScreenComponent } from './components/bridge-loading-screen/bridge-loading-screen.component';
-import { OdomPanelComponent } from './components/odom-panel/odom-panel.component'
+// import { SplashComponent } from './components/splash/splash.component';
+import { MappingHelperComponent } from './components/mapping-helper/mapping-helper.component';
+import { CdsModule } from '@cds/angular';
 
 @NgModule({
   declarations: [
     AppComponent,
-    BridgeLoadingScreenComponent,
-    OdomPanelComponent
+    // SplashComponent,
+    MappingHelperComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    ClarityModule
+    ClarityModule,
+    CdsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
