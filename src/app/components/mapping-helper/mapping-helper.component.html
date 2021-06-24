@@ -15,12 +15,15 @@
 		</clr-timeline-step-header>
 	</clr-timeline-step>
 </clr-timeline>
-<div id="instructionBox">
+<div *ngIf="isCurrent(zoneStepState)">
 	Zoom to the region where the pointcloud is located.
 </div>
+<div *ngIf="isCurrent(originStepState)">
+	Now click to add the zone's origin. This is usually where the 3D mapping was started. It can just be a guess; it will be adjusted in a later step.
+</div>
 <div class="map-container">
-	<div class="map-frame">
-		<div id="map"></div>
+	<div class="map-frame" [draggable]="!mapFrozen">
+		<div id="map" [style.cursor]="mapCursor"></div>
 	</div>
 </div>
 

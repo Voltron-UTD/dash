@@ -14,12 +14,29 @@ export class MappingHelperComponent implements AfterViewInit {
   zoneStepState: ClrTimelineStepState;
   originStepState: ClrTimelineStepState;
   pcdStepState: ClrTimelineStepState;
+  mapFrozen: boolean;
+
+  origin: L.LatLng | undefined;
+  originMarker: L.Marker | undefined;
 
   constructor() { 
     ClarityIcons.addIcons(cogIcon)
     this.zoneStepState = ClrTimelineStepState.CURRENT;
     this.originStepState = ClrTimelineStepState.NOT_STARTED;
     this.pcdStepState = ClrTimelineStepState.NOT_STARTED;
+    this.mapFrozen = false;
+  }
+
+  public get mapCursor(): string {
+    if(this.originStepState === ClrTimelineStepState.CURRENT) {
+      return "cell"
+    } else {
+      return ""
+    }
+  }
+
+  public isCurrent(state: ClrTimelineStepState): boolean {
+    return state === ClrTimelineStepState.CURRENT;
   }
 
   ngAfterViewInit(): void {
@@ -39,10 +56,36 @@ export class MappingHelperComponent implements AfterViewInit {
     });
 
     tiles.addTo(this.map);
+
+    this.map.on('click', (e: any)=> {
+      this.mapClicked(e);
+    })
+  }
+
+  setMapOrigin(point: L.LatLng): void {
+    if (this.originMarker === undefined) {
+      this.originMarker = L.marker(point).addTo(this.map);
+    } else {
+      this.originMarker.remove();
+      this.originMarker = L.marker(point).addTo(this.map);
+    }
+    
+    this.origin = point;
+  }
+
+  public mapClicked(e: L.LeafletMouseEvent): void {
+    console.log(e);
+
+    if (this.isCurrent(this.originStepState)) {
+      this.setMapOrigin(e.latlng);
+    }
   }
 
   finishZoneSelect(): void {
     console.log(this.map.getBounds())
+    this.zoneStepState = ClrTimelineStepState.SUCCESS;
+    this.originStepState = ClrTimelineStepState.CURRENT;
+    this.mapFrozen = true;
   }
 
 }
