@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 // import { SplashComponent } from './components/splash/splash.component';
 import { MappingHelperComponent } from './components/mapping-helper/mapping-helper.component';
 import { CdsModule } from '@cds/angular';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { CdsModule } from '@cds/angular';
     AppRoutingModule,
     ClarityModule,
     CdsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

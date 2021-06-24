@@ -4,6 +4,7 @@ import '@cds/core/icon/register.js';
 import '@cds/core/file/register.js';
 import { ClrTimelineStep, ClrTimelineStepState } from '@clr/angular';
 import * as L from 'leaflet';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-mapping-helper',
@@ -17,11 +18,13 @@ export class MappingHelperComponent implements AfterViewInit {
   pcdStepState: ClrTimelineStepState;
   mapFrozen: boolean;
   canProgress: boolean = true;
+
+  uploadedFiles: any | FileList;
   
   origin: L.LatLng | undefined;
   originMarker: L.Marker | undefined;
   
-  constructor() { 
+  constructor(private http: HttpClient) { 
     ClarityIcons.addIcons(cogIcon)
     this.zoneStepState = ClrTimelineStepState.CURRENT;
     this.originStepState = ClrTimelineStepState.NOT_STARTED;
@@ -35,6 +38,12 @@ export class MappingHelperComponent implements AfterViewInit {
     } else {
       return ""
     }
+  }
+
+  public get mapBoundaryString(): string {
+    if (this.map)
+      return this.map.getBounds().toBBoxString();
+    else return "unset"
   }
   
   public isCurrent(state: ClrTimelineStepState): boolean {
@@ -83,12 +92,38 @@ public mapClicked(e: L.LeafletMouseEvent): void {
   }
 }
 
+public freezeMap(): void {
+  this.mapFrozen = true;
+}
+
+fileChange(element: any) {
+  this.uploadedFiles = element.target.files;
+  console.log(this.uploadedFiles);
+}
+
+get canUpload(): boolean {
+  if (this.uploadedFiles)
+    return this.uploadedFiles.length > 0;
+  else return false;
+}
+
+uploadPcdFile(): void {
+  let formData = new FormData();
+  for (var i = 0; i < this.uploadedFiles.length; i++) {
+    formData.append("uploads[]", this.uploadedFiles[i], this.uploadedFiles[i].name);
+}
+  this.http.post('/api/pcd-upload', formData)
+  .subscribe((response) => {
+      console.log('response received is ', response);
+  })
+}
+
 nextClicked(): void {
   if (this.zoneStepState === ClrTimelineStepState.CURRENT) {
     console.log(this.map.getBounds())
     this.zoneStepState = ClrTimelineStepState.SUCCESS;
     this.originStepState = ClrTimelineStepState.CURRENT;
-    this.mapFrozen = true;
+    this.freezeMap();
   } else if (this.originStepState === ClrTimelineStepState.CURRENT) {
     this.originStepState = ClrTimelineStepState.SUCCESS;
     this.pcdStepState = ClrTimelineStepState.CURRENT;
