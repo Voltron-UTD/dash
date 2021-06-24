@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 // Clarity stuff
 import { ClarityModule } from '@clr/angular';
 import { ClarityIcons } from '@clr/icons';
+import { CdsIcon } from '@cds/core/icon/icon.element';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';

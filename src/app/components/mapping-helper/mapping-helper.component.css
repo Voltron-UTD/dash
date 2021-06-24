@@ -1,0 +1,13 @@
+.map-container {
+    position: relative;
+    height: 80vh;
+    width: 80vw;
+  }
+  
+  .map-frame {
+    height: 100%;
+  }
+  
+  #map {
+    height: 100%;
+  }
