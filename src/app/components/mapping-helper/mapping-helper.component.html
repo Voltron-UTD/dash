@@ -1,16 +1,31 @@
 <clr-timeline>
-	<clr-timeline-step>
-		<clr-timeline-step-header>11:59 am</clr-timeline-step-header>
-		<!-- clr-timeline-step-title -->
-		<!-- clr-timeline-step-description -->
+	<clr-timeline-step [clrState]="zoneStepState">
+		<clr-timeline-step-header >
+			Choose zone boundaries
+		</clr-timeline-step-header>
 	</clr-timeline-step>
-	<!-- Additional clr-timeline-step components -->
+	<clr-timeline-step [clrState]="originStepState">
+		<clr-timeline-step-header>
+			Choose origin
+		</clr-timeline-step-header>
+	</clr-timeline-step>
+	<clr-timeline-step [clrState]="pcdStepState">
+		<clr-timeline-step-header>
+			Upload PCD file
+		</clr-timeline-step-header>
+	</clr-timeline-step>
 </clr-timeline>
-
+<div id="instructionBox">
+	Zoom to the region where the pointcloud is located.
+</div>
 <div class="map-container">
 	<div class="map-frame">
 		<div id="map"></div>
 	</div>
 </div>
 
-<cds-icon shape="cog"></cds-icon>
+<button class="btn btn-primary" (click)="finishZoneSelect()">Next</button>
+
+
+
+<!-- <cds-icon shape="cog"></cds-icon> -->

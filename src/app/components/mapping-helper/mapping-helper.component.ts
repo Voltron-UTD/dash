@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ClarityIcons, cogIcon } from '@cds/core/icon';
 import '@cds/core/icon/register.js';
+import { ClrTimelineStep, ClrTimelineStepState } from '@clr/angular';
 import * as L from 'leaflet';
 
 @Component({
@@ -10,9 +11,15 @@ import * as L from 'leaflet';
 })
 export class MappingHelperComponent implements AfterViewInit {
   private map: any;
+  zoneStepState: ClrTimelineStepState;
+  originStepState: ClrTimelineStepState;
+  pcdStepState: ClrTimelineStepState;
 
   constructor() { 
     ClarityIcons.addIcons(cogIcon)
+    this.zoneStepState = ClrTimelineStepState.CURRENT;
+    this.originStepState = ClrTimelineStepState.NOT_STARTED;
+    this.pcdStepState = ClrTimelineStepState.NOT_STARTED;
   }
 
   ngAfterViewInit(): void {
@@ -32,6 +39,10 @@ export class MappingHelperComponent implements AfterViewInit {
     });
 
     tiles.addTo(this.map);
+  }
+
+  finishZoneSelect(): void {
+    console.log(this.map.getBounds())
   }
 
 }
