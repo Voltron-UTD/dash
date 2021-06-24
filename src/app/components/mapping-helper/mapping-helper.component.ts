@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ClarityIcons, cogIcon } from '@cds/core/icon';
 import '@cds/core/icon/register.js';
+import '@cds/core/file/register.js';
 import { ClrTimelineStep, ClrTimelineStepState } from '@clr/angular';
 import * as L from 'leaflet';
 
@@ -15,10 +16,11 @@ export class MappingHelperComponent implements AfterViewInit {
   originStepState: ClrTimelineStepState;
   pcdStepState: ClrTimelineStepState;
   mapFrozen: boolean;
-
+  canProgress: boolean = true;
+  
   origin: L.LatLng | undefined;
   originMarker: L.Marker | undefined;
-
+  
   constructor() { 
     ClarityIcons.addIcons(cogIcon)
     this.zoneStepState = ClrTimelineStepState.CURRENT;
@@ -26,7 +28,7 @@ export class MappingHelperComponent implements AfterViewInit {
     this.pcdStepState = ClrTimelineStepState.NOT_STARTED;
     this.mapFrozen = false;
   }
-
+  
   public get mapCursor(): string {
     if(this.originStepState === ClrTimelineStepState.CURRENT) {
       return "cell"
@@ -34,58 +36,65 @@ export class MappingHelperComponent implements AfterViewInit {
       return ""
     }
   }
-
+  
   public isCurrent(state: ClrTimelineStepState): boolean {
     return state === ClrTimelineStepState.CURRENT;
   }
-
+  
   ngAfterViewInit(): void {
     this.initMap();
   }
-
+  
   private initMap(): void {
     this.map = L.map('map', {
       center: [32.9865279, -96.7486954],
       zoom: 15
     });
-
-    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      minZoom: 3,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    });
-
-    tiles.addTo(this.map);
-
-    this.map.on('click', (e: any)=> {
-      this.mapClicked(e);
-    })
-  }
-
-  setMapOrigin(point: L.LatLng): void {
-    if (this.originMarker === undefined) {
-      this.originMarker = L.marker(point).addTo(this.map);
-    } else {
-      this.originMarker.remove();
-      this.originMarker = L.marker(point).addTo(this.map);
-    }
     
-    this.origin = point;
+    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    minZoom: 3,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  });
+  
+  tiles.addTo(this.map);
+  
+  this.map.on('click', (e: any)=> {
+    this.mapClicked(e);
+  })
+}
+
+setMapOrigin(point: L.LatLng): void {
+  if (this.originMarker === undefined) {
+    this.originMarker = L.marker(point).addTo(this.map);
+  } else {
+    this.originMarker.remove();
+    this.originMarker = L.marker(point).addTo(this.map);
   }
+  
+  this.origin = point;
+}
 
-  public mapClicked(e: L.LeafletMouseEvent): void {
-    console.log(e);
-
-    if (this.isCurrent(this.originStepState)) {
-      this.setMapOrigin(e.latlng);
-    }
+public mapClicked(e: L.LeafletMouseEvent): void {
+  console.log(e);
+  
+  if (this.isCurrent(this.originStepState)) {
+    this.setMapOrigin(e.latlng);
   }
+}
 
-  finishZoneSelect(): void {
+nextClicked(): void {
+  if (this.zoneStepState === ClrTimelineStepState.CURRENT) {
     console.log(this.map.getBounds())
     this.zoneStepState = ClrTimelineStepState.SUCCESS;
     this.originStepState = ClrTimelineStepState.CURRENT;
     this.mapFrozen = true;
+  } else if (this.originStepState === ClrTimelineStepState.CURRENT) {
+    this.originStepState = ClrTimelineStepState.SUCCESS;
+    this.pcdStepState = ClrTimelineStepState.CURRENT;
+    this.canProgress = false;
   }
+  
+}
 
 }
