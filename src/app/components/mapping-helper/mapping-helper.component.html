@@ -20,7 +20,8 @@
 	<i>Current bounds: {{mapBoundaryString}}</i>
 </div>
 <div *ngIf="isCurrent(originStepState)">
-	Now click to add the zone's origin. This is usually where the 3D mapping was started. It can just be a guess; it will be adjusted in a later step.
+	Now click to add the zone's origin. This is usually where the 3D mapping was started. It can just be a guess; it will be adjusted in a later step. <br/>
+	{{ origin }}
 </div>
 <div class="map-container">
 	<div class="map-frame" [draggable]="!mapFrozen">
@@ -33,6 +34,9 @@
 </cds-file>
 <span>
 	<button class="btn btn-primary" (click)="uploadPcdFile()" [disabled]="!canUpload" *ngIf="isCurrent(pcdStepState)">Upload</button>
+	<button class="btn btn-primary" (click)="pasteFromClipboard()" *ngIf="isCurrent(pcdStepState)">
+		Paste from Clipboard
+	</button>
 	<button class="btn btn-primary" [disabled]="!canProgress" (click)="nextClicked()">Next</button>
 
 </span>
