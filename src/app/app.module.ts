@@ -12,19 +12,23 @@ import { AppComponent } from './app.component';
 import { MappingHelperComponent } from './components/mapping-helper/mapping-helper.component';
 import { CdsModule } from '@cds/angular';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { DrivePageComponent } from './components/drive-page/drive-page.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     // SplashComponent,
-    MappingHelperComponent
+    MappingHelperComponent,
+    DrivePageComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ClarityModule,
     CdsModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,46 +1,94 @@
 <clr-timeline>
-	<clr-timeline-step [clrState]="zoneStepState">
-		<clr-timeline-step-header >
-			Choose zone boundaries
-		</clr-timeline-step-header>
-	</clr-timeline-step>
-	<clr-timeline-step [clrState]="originStepState">
-		<clr-timeline-step-header>
-			Choose origin
-		</clr-timeline-step-header>
-	</clr-timeline-step>
-	<clr-timeline-step [clrState]="pcdStepState">
-		<clr-timeline-step-header>
-			Upload PCD file
-		</clr-timeline-step-header>
-	</clr-timeline-step>
+  <clr-timeline-step [clrState]="zoneStepState">
+    <clr-timeline-step-header>
+      Choose zone boundaries
+    </clr-timeline-step-header>
+  </clr-timeline-step>
+  <clr-timeline-step [clrState]="originStepState">
+    <clr-timeline-step-header> Choose origin </clr-timeline-step-header>
+  </clr-timeline-step>
+  <clr-timeline-step [clrState]="pcdStepState">
+    <clr-timeline-step-header> Upload PCD file </clr-timeline-step-header>
+  </clr-timeline-step>
+  <clr-timeline-step [clrState]="alignStepState">
+    <clr-timeline-step-header> Align markers </clr-timeline-step-header>
+  </clr-timeline-step>
 </clr-timeline>
 <div *ngIf="isCurrent(zoneStepState)">
-	Zoom to the region where the pointcloud is located.<br/>
-	<i>Current bounds: {{mapBoundaryString}}</i>
+  Zoom to the region where the pointcloud is located.<br />
+  <i>Current bounds: {{ mapBoundaryString }}</i>
 </div>
 <div *ngIf="isCurrent(originStepState)">
-	Now click to add the zone's origin. This is usually where the 3D mapping was started. It can just be a guess; it will be adjusted in a later step. <br/>
-	{{ origin }}
+  Now click to add the zone's origin. This is usually where the 3D mapping was
+  started. It can just be a guess; it will be adjusted in a later step. <br />
+  {{ origin }}
+</div>
+<div *ngIf="isCurrent(alignStepState)">
+  Use the controls below to align the markers with the map.
 </div>
 <div class="map-container">
-	<div class="map-frame" [draggable]="!mapFrozen">
-		<div id="map" [style.cursor]="mapCursor"></div>
-	</div>
+  <div class="map-frame" [draggable]="!mapFrozen">
+    <div id="map" [style.cursor]="mapCursor"></div>
+  </div>
 </div>
-<cds-file *ngIf="isCurrent(pcdStepState)">
+<!-- <cds-file *ngIf="isCurrent(pcdStepState)">
 	<label>Upload .pcd file</label>
 	<input (change)="fileChange($event)" type="file"/>
-</cds-file>
+</cds-file> -->
 <span>
-	<button class="btn btn-primary" (click)="uploadPcdFile()" [disabled]="!canUpload" *ngIf="isCurrent(pcdStepState)">Upload</button>
-	<button class="btn btn-primary" (click)="pasteFromClipboard()" *ngIf="isCurrent(pcdStepState)">
-		Paste from Clipboard
-	</button>
-	<button class="btn btn-primary" [disabled]="!canProgress" (click)="nextClicked()">Next</button>
-
+  <!-- <button class="btn btn-primary" (click)="uploadPcdFile()" [disabled]="!canUpload" *ngIf="isCurrent(pcdStepState)">Upload</button> -->
+  <form clrForm>
+    <clr-range-container [clrRangeHasProgress]="true">
+      <label>PCD detail level</label>
+      <input
+        type="range"
+        clrRange
+        [(ngModel)]="pcdDetailLevel"
+        name="pcdDetailSlider"
+      />
+      <!-- <clr-control-helper>Helper text</clr-control-helper> -->
+    </clr-range-container>
+	<clr-input-container *ngIf="isCurrent(alignStepState)">
+		<label>Rotation</label>
+		<input clrInput [(ngModel)]="pcdRotation" name="rotationInput" required />
+		<clr-control-helper>(Radians)</clr-control-helper>
+	  </clr-input-container>
+	  <clr-input-container *ngIf="isCurrent(alignStepState)">
+		<label>Horizontal offset</label>
+		<input clrInput [(ngModel)]="pcdXOffset" name="xOffInput" required />
+		<clr-control-helper>(Meters)</clr-control-helper>
+	  </clr-input-container>
+	  <clr-input-container *ngIf="isCurrent(alignStepState)">
+		<label>Vertical offset</label>
+		<input clrInput [(ngModel)]="pcdYOffset" name="yOffInput" required />
+		<clr-control-helper>(Meters)</clr-control-helper>
+	  </clr-input-container>
+	  <clr-input-container *ngIf="isCurrent(alignStepState)">
+		<label>Horizontal stretch</label>
+		<input clrInput [(ngModel)]="pcdXStretch" name="xStretchInput" required />
+		<clr-control-helper>(Percent)</clr-control-helper>
+	  </clr-input-container>
+	  <clr-input-container *ngIf="isCurrent(alignStepState)">
+		<label>Vertical stretch</label>
+		<input clrInput [(ngModel)]="pcdYStretch" name="yStretchInput" required />
+		<clr-control-helper>(Percent)</clr-control-helper>
+	  </clr-input-container>
+  </form>
+  <button class="btn btn-link" (click)="refreshMap()">Update view</button>
+  <button
+    class="btn btn-primary"
+    (click)="pasteFromClipboard()"
+    *ngIf="isCurrent(pcdStepState)"
+  >
+    Paste from Clipboard
+  </button>
+  <button
+    class="btn btn-primary"
+    [disabled]="!canProgress"
+    (click)="nextClicked()"
+  >
+    Next
+  </button>
 </span>
-
-
 
 <!-- <cds-icon shape="cog"></cds-icon> -->

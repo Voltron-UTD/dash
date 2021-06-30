@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { ClarityIcons, cogIcon } from '@cds/core/icon';
+import { ClarityIcons, cogIcon, pictureIcon } from '@cds/core/icon';
 import '@cds/core/icon/register.js';
 import '@cds/core/file/register.js';
 import { ClrTimelineStep, ClrTimelineStepState } from '@clr/angular';
@@ -19,11 +19,20 @@ export class MappingHelperComponent implements AfterViewInit {
   zoneStepState: ClrTimelineStepState;
   originStepState: ClrTimelineStepState;
   pcdStepState: ClrTimelineStepState;
+  alignStepState: ClrTimelineStepState;
   mapFrozen: boolean;
   canProgress: boolean = true;
 
   uploadedFiles: any | FileList;
   pcdText: string = '';
+  pcdDetailLevel: number = 10;
+  pcdRotation: number = 0; //degrees
+  pcdXOffset: number = 0; //meters
+  pcdYOffset: number = 0; //meters
+  pcdXStretch: number = 100;
+  pcdYStretch: number = 100;
+  pcdMarkers: L.CircleMarker[] = [];
+  latlngs: L.LatLng[] = [];
 
   origin: L.LatLng = L.latLng(-1,-1); //init to bogus number
   originMarker: L.Marker | undefined;
@@ -34,6 +43,7 @@ export class MappingHelperComponent implements AfterViewInit {
     this.zoneStepState = ClrTimelineStepState.CURRENT;
     this.originStepState = ClrTimelineStepState.NOT_STARTED;
     this.pcdStepState = ClrTimelineStepState.NOT_STARTED;
+    this.alignStepState = ClrTimelineStepState.NOT_STARTED;
     this.mapFrozen = false;
   }
 
@@ -60,16 +70,52 @@ export class MappingHelperComponent implements AfterViewInit {
 
   public addMarkers(map: L.Map, points: L.LatLng[]) {
     for (const point of points) {
+      if (Math.random() < (this.pcdDetailLevel/600)) {
+        // rotate the point
+        let newPoint = this.rotateLatLng(point, this.pcdRotation, this.origin);
+
+        let origin_lat = this.origin.lat*2*Math.PI/360
+        let degrees_lat_per_meter = 1/(111132.92-559.82*Math.cos(2*origin_lat)+1.175*Math.cos(4*origin_lat)-0.0023*Math.cos(6*origin_lat));
+        let degrees_lng_per_meter = 1/(111412.84*Math.cos(origin_lat)-93.5*Math.cos(3*origin_lat)+0.118*Math.cos(5*origin_lat));
+        //apply offset
+        newPoint.lng += this.pcdXOffset * degrees_lng_per_meter;
+        newPoint.lat += this.pcdYOffset * degrees_lat_per_meter;
+
+        // apply stretch
+        newPoint.lng = ((newPoint.lng - this.origin.lng)*(this.pcdXStretch/100))+this.origin.lng;
+        newPoint.lat = ((newPoint.lat - this.origin.lat)*(this.pcdXStretch/100))+this.origin.lat;
+        
+
+        // create a marker for the point and add it
+        const marker = L.circleMarker(newPoint, {
+          radius: 2
+        });
+        this.pcdMarkers.push(marker);
+        marker.addTo(map);
+      }
       // const marker = new L.Marker([point.lat, point.lng],
       //   {
       //     icon: new L.Icon
       //   }
       // );
-      const marker = L.circleMarker(point, {
-        radius: 5
-      });
-      marker.addTo(map);
+      this.canProgress = true;
     }
+  }
+
+  private rotateLatLng(point: L.LatLng, angle: number, pivot: L.LatLng) {
+    let s = Math.sin(angle);
+    let c = Math.cos(angle);
+
+    point.lng -= pivot.lng;
+    point.lat -= pivot.lat;
+
+    let lngNew = point.lng * c - point.lat * s;
+    let latNew = point.lng * s + point.lat * c;
+
+    point.lng = lngNew + pivot.lng;
+    point.lat = latNew + pivot.lat;
+
+    return point;
   }
 
   private initMap(): void {
@@ -180,26 +226,19 @@ export class MappingHelperComponent implements AfterViewInit {
     let origin_lat = this.origin.lat*2*Math.PI/360
     let degrees_lat_per_meter = 1/(111132.92-559.82*Math.cos(2*origin_lat)+1.175*Math.cos(4*origin_lat)-0.0023*Math.cos(6*origin_lat));
     let degrees_lng_per_meter = 1/(111412.84*Math.cos(origin_lat)-93.5*Math.cos(3*origin_lat)+0.118*Math.cos(5*origin_lat));
-    console.log(degrees_lng_per_meter);
-
-    let latlngs: L.LatLng[] = [];
-    console.log(substrings);
+    // console.log(degrees_lng_per_meter);
+    // console.log(substrings);
 
     for(var pointstr of substrings) {
-      const THRESHOLD = 0.05;
-      if (Math.random() < THRESHOLD) {
-        let elems: string[] = pointstr.split(' ');
-        console.log(pointstr);
-        if (elems.length===4){
-          let latlng = this.getLatLngPoint(parseFloat(elems[0]),parseFloat(elems[1]),degrees_lat_per_meter, degrees_lng_per_meter);
-          latlngs.push(latlng);
-        }
+      let elems: string[] = pointstr.split(' ');
+      // console.log(pointstr);
+      if (elems.length===4){
+        let latlng = this.getLatLngPoint(parseFloat(elems[0]),parseFloat(elems[1]),degrees_lat_per_meter, degrees_lng_per_meter);
+        this.latlngs.push(latlng);
       }
-      
-      
     }
 
-    this.addMarkers(this.map, latlngs);
+    this.addMarkers(this.map, this.latlngs);
 
    
   }
@@ -215,8 +254,21 @@ export class MappingHelperComponent implements AfterViewInit {
       this.originStepState = ClrTimelineStepState.SUCCESS;
       this.pcdStepState = ClrTimelineStepState.CURRENT;
       this.canProgress = false;
+    } else if (this.pcdStepState === ClrTimelineStepState.CURRENT) {
+      this.pcdStepState = ClrTimelineStepState.SUCCESS;
+      this.alignStepState = ClrTimelineStepState.CURRENT;
+      this.canProgress=false;
     }
   }
+
+  public refreshMap(): void {
+    for(const marker of this.pcdMarkers) {
+      (this.map as L.Map).removeLayer(marker)
+    }
+    this.addMarkers(this.map, this.latlngs);
+    
+  }
+
 }
 
 class DebugCoords extends L.GridLayer {
